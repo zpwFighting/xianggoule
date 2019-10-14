@@ -312,7 +312,7 @@ public class TbBrandExample {
         }
     }
 
-    public static class Criterion {
+    public static class Criterion {    
         private String condition;
 
         private Object value;
