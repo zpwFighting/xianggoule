@@ -5,9 +5,14 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xianggole.mapper.TbSpecificationMapper;
+import com.xianggole.mapper.TbSpecificationOptionMapper;
 import com.xianggole.pojo.TbSpecification;
 import com.xianggole.pojo.TbSpecificationExample;
+import com.xianggole.pojo.TbSpecificationOption;
+import com.xianggole.pojo.TbSpecificationOptionExample;
 import com.xianggole.pojo.TbSpecificationExample.Criteria;
+
+import com.xianggole.pojogroup.Specification;
 import com.xianggole.sellergoods.service.SpecificationService;
 
 import entity.PageResult;
@@ -23,6 +28,8 @@ public class SpecificationServiceImpl implements SpecificationService {
 
 	@Autowired
 	private TbSpecificationMapper specificationMapper;
+	@Autowired
+	private TbSpecificationOptionMapper tbSpecificationOptionMapper;
 	
 	/**
 	 * 查询全部
@@ -46,8 +53,15 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * 增加
 	 */
 	@Override
-	public void add(TbSpecification specification) {
-		specificationMapper.insert(specification);		
+	public void add(Specification specification) {
+		TbSpecification tbSpecification = specification.getSpecification();
+		specificationMapper.insert(tbSpecification);
+		List<TbSpecificationOption> tbSpecificationOption = specification.getSpecificationOptionList();
+		
+		for(TbSpecificationOption option : tbSpecificationOption ) {
+			option.setSpecId(tbSpecification.getId());
+			tbSpecificationOptionMapper.insert(option);
+		}
 	}
 
 	
@@ -55,8 +69,14 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * 修改
 	 */
 	@Override
-	public void update(TbSpecification specification){
-		specificationMapper.updateByPrimaryKey(specification);
+	public void update(Specification specification){
+		List<TbSpecificationOption> specificationOptionList = specification.getSpecificationOptionList();
+		TbSpecification tbSpecification = specification.getSpecification();
+		for(TbSpecificationOption option :specificationOptionList) {
+			tbSpecificationOptionMapper.deleteByPrimaryKey(option.getId());
+		}
+		specificationMapper.deleteByPrimaryKey(tbSpecification.getId());
+		add(specification);
 	}	
 	
 	/**
@@ -65,8 +85,16 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * @return
 	 */
 	@Override
-	public TbSpecification findOne(Long id){
-		return specificationMapper.selectByPrimaryKey(id);
+	public Specification findOne(Long id){
+		TbSpecification tbSpecification = specificationMapper.selectByPrimaryKey(id);
+		Specification specification = new Specification();
+		specification.setSpecification(tbSpecification);
+		TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+		com.xianggole.pojo.TbSpecificationOptionExample.Criteria criteria = example.createCriteria();
+		criteria.andSpecIdEqualTo(id);
+		List<TbSpecificationOption> tbSpecificationOption = tbSpecificationOptionMapper.selectByExample(example);
+		specification.setSpecificationOptionList(tbSpecificationOption);
+		return specification;
 	}
 
 	/**
@@ -74,7 +102,11 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 */
 	@Override
 	public void delete(Long[] ids) {
+		TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+		com.xianggole.pojo.TbSpecificationOptionExample.Criteria criteria = example.createCriteria();
 		for(Long id:ids){
+			criteria.andSpecIdEqualTo(id);
+			tbSpecificationOptionMapper.deleteByExample(example);
 			specificationMapper.deleteByPrimaryKey(id);
 		}		
 	}
