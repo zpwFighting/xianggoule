@@ -17,4 +17,8 @@
 		this.search = function(page,size,searchEntity){
 			return $http.post('../brand/search.do?page='+page+'&size='+size,searchEntity);
 		}
+		//下拉列表
+		this.selectOptionList=function(){
+			return $http.get('../brand/selectOptionList.do');
+		}
 	});

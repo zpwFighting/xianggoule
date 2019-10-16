@@ -1,6 +1,7 @@
 package com.xianggole.sellergoods.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.xianggole.pojo.TbBrand;
 
@@ -36,5 +37,7 @@ public interface BrandService {
 	 * 删除
 	 */
 	public void delete(Long[] ids);
+	
+	public List<Map> selectOptionList();
 
 }
