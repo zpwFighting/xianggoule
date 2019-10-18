@@ -1,5 +1,6 @@
 package com.xianggole.manager.controller;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -111,6 +112,15 @@ public class SpecificationController {
 	@RequestMapping("/search")
 	public PageResult search(@RequestBody TbSpecification specification, int page, int rows  ){
 		return specificationService.findPage(specification, page, rows);		
+	}
+	
+	/**
+	 * 查找下拉列表
+	 * 
+	 */
+	@RequestMapping("/selectOptionList")
+	public List<Map> selectOptionList(){
+		return specificationService.selectOptionList();
 	}
 	
 }

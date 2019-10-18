@@ -1,5 +1,7 @@
 package com.xianggole.sellergoods.service;
 import java.util.List;
+import java.util.Map;
+
 import com.xianggole.pojo.TbSpecification;
 import com.xianggole.pojogroup.Specification;
 
@@ -60,4 +62,8 @@ public interface SpecificationService {
 	 */
 	public PageResult findPage(TbSpecification specification, int pageNum,int pageSize);
 	
+	/**
+	 * 分页
+	 */
+	public List<Map> selectOptionList();
 }
