@@ -40,7 +40,7 @@
 	</beans:bean>
 	
 	<!-- 引用dubbo 服务 -->
-	<dubbo:application name="xianggole-manager-web" />
+	<dubbo:application name="xianggole-shop-web" />
 	<dubbo:registry address="zookeeper://192.168.25.110:2181"/>
     <dubbo:reference id="sellerService1" interface="com.xianggole.sellergoods.service.SellerService"></dubbo:reference>
  	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></beans:bean>
