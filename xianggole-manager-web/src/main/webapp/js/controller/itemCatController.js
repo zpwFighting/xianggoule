@@ -43,7 +43,7 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			function(response){
 				if(response.success){
 					//重新查询 
-		        	$scope.reloadList();//重新加载
+		        	$scope.findParentById($scope.entity.parentId)//重新加载
 				}else{
 					alert(response.message);
 				}
@@ -79,6 +79,7 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 	$scope.findParentById=function(parentId){
 		itemCatService.findParentById(parentId).success(function(responce){
 			$scope.list=responce;
+			$scope.entity.parentId=parentId;
 		});
 	}
 	
@@ -102,11 +103,14 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			$scope.entity_2=p_entity;
 		}
 		$scope.findParentById(p_entity.id);
-		$scope.entity.parentId=p_entity.id;
+		
 	}
+	
+	$scope.type_template={data:[]}
+	
 	$scope.findType=function(){
-		typeTemplateService.findAll().success(function(response){
-			$scope.type_template=response.id;
+		typeTemplateService.findType().success(function(response){
+			$scope.type_template={data:response};
 		});
 	}
     
