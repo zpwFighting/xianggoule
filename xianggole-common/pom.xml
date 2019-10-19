@@ -5,5 +5,16 @@
     <artifactId>xianggole-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  <dependencies>
+  <!-- 文件上传组建 -->
+	<dependency>
+			<groupId>org.csource.fastdfs</groupId>
+			<artifactId>fastdfs</artifactId>
+	</dependency>
+	<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+	</dependency>
+  </dependencies>
   <artifactId>xianggole-common</artifactId>
 </project>

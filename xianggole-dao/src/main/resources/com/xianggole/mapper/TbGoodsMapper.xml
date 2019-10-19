@@ -114,7 +114,7 @@
   </delete>
   <insert id="insert" parameterType="com.xianggole.pojo.TbGoods" >
     <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
-       SELECT LAST_INSTER_ID() AS id
+       SELECT LAST_INSERT_ID() AS id
     </selectKey>
     insert into tb_goods (id, seller_id, goods_name, 
       default_item_id, audit_status, is_marketable, 
