@@ -1,6 +1,7 @@
 package com.xianggole.sellergoods.service;
 import java.util.List;
 import com.xianggole.pojo.TbGoods;
+import com.xianggole.pojogroup.Goods;
 
 import entity.PageResult;
 /**
@@ -28,7 +29,7 @@ public interface GoodsService {
 	/**
 	 * 增加
 	*/
-	public void add(TbGoods goods);
+	public void add(Goods goods);
 	
 	
 	/**

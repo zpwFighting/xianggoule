@@ -71,11 +71,21 @@ public class ItemCatServiceImpl implements ItemCatService {
 
 	/**
 	 * 批量删除
+	 * @throws Exception 
 	 */
 	@Override
-	public void delete(Long[] ids) {
+	public void delete(Long[] ids) throws Exception {
+		TbItemCatExample example=new TbItemCatExample();
+		Criteria criteria = example.createCriteria();
+		
 		for(Long id:ids){
-			itemCatMapper.deleteByPrimaryKey(id);
+			criteria.andParentIdEqualTo(id);
+			List<TbItemCat> selectByExample = itemCatMapper.selectByExample(example);
+			if(selectByExample.size()!=0) {
+				throw new Exception("不能删除有子结点的数据");
+			}else {
+			 itemCatMapper.deleteByPrimaryKey(id);
+			}
 		}		
 	}
 	

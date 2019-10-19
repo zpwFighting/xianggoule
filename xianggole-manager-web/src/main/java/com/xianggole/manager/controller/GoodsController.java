@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.xianggole.pojo.TbGoods;
+import com.xianggole.pojogroup.Goods;
 import com.xianggole.sellergoods.service.GoodsService;
 
 import entity.PageResult;
@@ -48,7 +49,7 @@ public class GoodsController {
 	 * @return
 	 */
 	@RequestMapping("/add")
-	public Result add(@RequestBody TbGoods goods){
+	public Result add(@RequestBody Goods goods){
 		try {
 			goodsService.add(goods);
 			return new Result(true, "添加成功");

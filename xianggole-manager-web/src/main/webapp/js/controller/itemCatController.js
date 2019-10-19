@@ -26,7 +26,8 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 	$scope.findOne=function(id){				
 		itemCatService.findOne(id).success(
 			function(response){
-				$scope.entity= response;					
+				$scope.entity= response;
+				
 			}
 		);				
 	}
@@ -60,7 +61,9 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 				if(response.success){
 					$scope.reloadList();//刷新列表
 					$scope.selectIds=[];
-				}						
+				}else{
+					alert(response.message);
+				}
 			}		
 		);				
 	}
@@ -76,6 +79,7 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			}			
 		);
 	}
+	$scope.entity={parentId:0};
 	$scope.findParentById=function(parentId){
 		itemCatService.findParentById(parentId).success(function(responce){
 			$scope.list=responce;
@@ -113,5 +117,8 @@ app.controller('itemCatController' ,function($scope,$controller   ,itemCatServic
 			$scope.type_template={data:response};
 		});
 	}
+	
+	
+	
     
 });	

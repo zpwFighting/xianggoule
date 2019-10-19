@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.xianggole.mapper.TbGoodsDescMapper;
 import com.xianggole.mapper.TbGoodsMapper;
 import com.xianggole.pojo.TbGoods;
+import com.xianggole.pojo.TbGoodsDesc;
 import com.xianggole.pojo.TbGoodsExample;
 import com.xianggole.pojo.TbGoodsExample.Criteria;
+import com.xianggole.pojogroup.Goods;
 import com.xianggole.sellergoods.service.GoodsService;
 
 import entity.PageResult;
@@ -41,13 +44,20 @@ public class GoodsServiceImpl implements GoodsService {
 		Page<TbGoods> page=   (Page<TbGoods>) goodsMapper.selectByExample(null);
 		return new PageResult(page.getTotal(), page.getResult());
 	}
+	
+	@Autowired
+	private TbGoodsDescMapper goodsDescMapper;
 
 	/**
 	 * 增加
 	 */
 	@Override
-	public void add(TbGoods goods) {
-		goodsMapper.insert(goods);		
+	public void add(Goods goods) {
+		goods.getGoods().setAuditStatus("0");
+		goodsMapper.insert(goods.getGoods());	
+		
+		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
+		goodsDescMapper.insert(goods.getGoodsDesc());
 	}
 
 	
@@ -118,5 +128,7 @@ public class GoodsServiceImpl implements GoodsService {
 		Page<TbGoods> page= (Page<TbGoods>)goodsMapper.selectByExample(example);		
 		return new PageResult(page.getTotal(), page.getResult());
 	}
+
+		
 	
 }
