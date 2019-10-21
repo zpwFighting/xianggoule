@@ -3,10 +3,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.xianggole.mapper.TbSpecificationOptionMapper;
 import com.xianggole.mapper.TbTypeTemplateMapper;
+import com.xianggole.pojo.TbSpecificationOption;
+import com.xianggole.pojo.TbSpecificationOptionExample;
 import com.xianggole.pojo.TbTypeTemplate;
 import com.xianggole.pojo.TbTypeTemplateExample;
 import com.xianggole.pojo.TbTypeTemplateExample.Criteria;
@@ -113,6 +118,22 @@ public class TypeTemplateServiceImpl implements TypeTemplateService {
 		public List<Map> findType() {
 			
 			return typeTemplateMapper.selectAllType();
+		}
+		@Autowired
+		private TbSpecificationOptionMapper specificationOptionMapper;
+		@Override
+		public List<Map> findSpecList(Long id) {
+			TbTypeTemplate typeTemplate = typeTemplateMapper.selectByPrimaryKey(id);
+			List<Map> list = JSON.parseArray(typeTemplate.getSpecIds(),Map.class);
+			for(Map map : list) {
+				TbSpecificationOptionExample example = new TbSpecificationOptionExample();
+				com.xianggole.pojo.TbSpecificationOptionExample.Criteria createCriteria = example.createCriteria();
+				createCriteria.andSpecIdEqualTo(new Long((Integer)map.get("id")));
+				List<TbSpecificationOption> options = specificationOptionMapper.selectByExample(example);
+				map.put("options", options);
+			}
+			
+			return list;
 		}
 	
 }

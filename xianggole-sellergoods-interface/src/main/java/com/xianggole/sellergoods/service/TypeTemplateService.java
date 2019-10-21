@@ -63,4 +63,10 @@ public interface TypeTemplateService {
 	
 	
 	public List<Map> findType();
+	
+	/**
+	 * 查找规格中的具体属性
+	 */
+	
+	public List<Map> findSpecList(Long id);
 }
