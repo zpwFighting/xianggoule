@@ -22,6 +22,7 @@ import com.xianggole.pojo.TbGoodsExample;
 import com.xianggole.pojo.TbGoodsExample.Criteria;
 import com.xianggole.pojo.TbItem;
 import com.xianggole.pojo.TbItemCat;
+import com.xianggole.pojo.TbItemExample;
 import com.xianggole.pojo.TbSeller;
 import com.xianggole.pojogroup.Goods;
 import com.xianggole.sellergoods.service.GoodsService;
@@ -79,40 +80,62 @@ public class GoodsServiceImpl implements GoodsService {
 		
 		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
 		goodsDescMapper.insert(goods.getGoodsDesc());
+		saveItemList(goods);
+	}
+	
+	
+	//插入SKU列表空间
+	private void saveItemList(Goods goods) {
+		if("1".equals(goods.getGoods().getIsEnableSpec())) {
+			
+			
+			for(TbItem item : goods.getItemList()) {
+				//构建标题  SPU名称+规格选项值
+				String title = goods.getGoods().getGoodsName();
+				Map<String,Object> map = JSON.parseObject(item.getSpec());
+				for(String key:map.keySet()) {
+					title+=""+map.get(key);
+				}
+				item.setTitle(title);
+				
+				//商品分类  三级分类
+				setItemValue(item, goods);
+			}
+			}else {
+				TbItem item = new TbItem();
+				item.setTitle(goods.getGoods().getGoodsName());
+				item.setPrice(goods.getGoods().getPrice());
+				item.setNum(9999);
+				item.setStatus("1");
+				item.setIsDefault("1");
+				item.setSpec("{}");
+				setItemValue(item, goods);
+			}
+	}
+	private void setItemValue(TbItem item,Goods goods) {
+		//商品分类  三级分类
+		item.setCategoryid(goods.getGoods().getCategory3Id());
+		item.setCreateTime(new Date());
+		item.setUpdateTime(new Date());
 		
-		for(TbItem item : goods.getItemList()) {
-			//构建标题  SPU名称+规格选项值
-			String title = goods.getGoods().getGoodsName();
-			Map<String,Object> map = JSON.parseObject(item.getSpec());
-			for(String key:map.keySet()) {
-				title+=""+map.get(key);
-			}
-			item.setTitle(title);
-			
-			//商品分类  三级分类
-			item.setCategoryid(goods.getGoods().getCategory3Id());
-			item.setCreateTime(new Date());
-			item.setUpdateTime(new Date());
-			
-			item.setGoodsId(goods.getGoods().getId());
-			item.setSellerId(goods.getGoods().getSellerId());
-			
-			TbItemCat selectByPrimaryKey = itemCatMapper.selectByPrimaryKey(goods.getGoods().getCategory3Id());
-			item.setCategory(selectByPrimaryKey.getName());
-			
-			TbBrand brand = brandMapper.selectByPrimaryKey(goods.getGoods().getBrandId());
-			item.setBrand(brand.getName());
-			
-			TbSeller seller = sellerMapper.selectByPrimaryKey(goods.getGoods().getSellerId());
-			item.setSeller(seller.getName());
-			//图片
-			List<Map> imageList = JSON.parseArray(goods.getGoodsDesc().getItemImages(),Map.class);
-			if(imageList.size()>0) {
-				item.setImage((String)imageList.get(0).get("url"));
-			}
-			
-			itemMapper.insert(item);
+		item.setGoodsId(goods.getGoods().getId());
+		item.setSellerId(goods.getGoods().getSellerId());
+		
+		TbItemCat selectByPrimaryKey = itemCatMapper.selectByPrimaryKey(goods.getGoods().getCategory3Id());
+		item.setCategory(selectByPrimaryKey.getName());
+		
+		TbBrand brand = brandMapper.selectByPrimaryKey(goods.getGoods().getBrandId());
+		item.setBrand(brand.getName());
+		
+		TbSeller seller = sellerMapper.selectByPrimaryKey(goods.getGoods().getSellerId());
+		item.setSeller(seller.getName());
+		//图片
+		List<Map> imageList = JSON.parseArray(goods.getGoodsDesc().getItemImages(),Map.class);
+		if(imageList.size()>0) {
+			item.setImage((String)imageList.get(0).get("url"));
 		}
+		itemMapper.insert(item);
+		
 	}
 
 	
@@ -120,8 +143,21 @@ public class GoodsServiceImpl implements GoodsService {
 	 * 修改
 	 */
 	@Override
-	public void update(TbGoods goods){
-		goodsMapper.updateByPrimaryKey(goods);
+	public void update(Goods goods){
+		//更新基本表数据
+		goodsMapper.updateByPrimaryKey(goods.getGoods());
+		//更新扩展表空间
+		goodsDescMapper.updateByPrimaryKey(goods.getGoodsDesc());
+		
+		//删除原有的SKU列表数据
+		
+		TbItemExample example = new TbItemExample();
+		com.xianggole.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+		criteria.andGoodsIdEqualTo(goods.getGoods().getId());
+		itemMapper.deleteByExample(example);
+		
+		//插入新的SKU列表数据
+		saveItemList(goods);
 	}	
 	
 	/**
@@ -130,8 +166,25 @@ public class GoodsServiceImpl implements GoodsService {
 	 * @return
 	 */
 	@Override
-	public TbGoods findOne(Long id){
-		return goodsMapper.selectByPrimaryKey(id);
+	public Goods findOne(Long id){
+		Goods goods = new Goods();
+		
+		TbGoods tbGoods = goodsMapper.selectByPrimaryKey(id);
+		goods.setGoods(tbGoods);
+		
+		TbGoodsDesc goodsDesc = goodsDescMapper.selectByPrimaryKey(id);
+		goods.setGoodsDesc(goodsDesc);
+		
+		// 读取SKU列表
+		
+		TbItemExample example = new TbItemExample();
+		com.xianggole.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+		criteria.andGoodsIdEqualTo(id);
+		
+		
+		List<TbItem> itemList = itemMapper.selectByExample(example );
+		goods.setItemList(itemList);
+		return goods;
 	}
 
 	/**
@@ -153,8 +206,9 @@ public class GoodsServiceImpl implements GoodsService {
 		Criteria criteria = example.createCriteria();
 		
 		if(goods!=null){			
-						if(goods.getSellerId()!=null && goods.getSellerId().length()>0){
-				criteria.andSellerIdLike("%"+goods.getSellerId()+"%");
+			if(goods.getSellerId()!=null && goods.getSellerId().length()>0){
+				//criteria.andSellerIdLike("%"+goods.getSellerId()+"%");
+				criteria.andSellerIdEqualTo(goods.getSellerId());
 			}
 			if(goods.getGoodsName()!=null && goods.getGoodsName().length()>0){
 				criteria.andGoodsNameLike("%"+goods.getGoodsName()+"%");
