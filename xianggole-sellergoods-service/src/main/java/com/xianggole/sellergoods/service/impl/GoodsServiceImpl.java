@@ -238,6 +238,17 @@ public class GoodsServiceImpl implements GoodsService {
 		return new PageResult(page.getTotal(), page.getResult());
 	}
 
+		@Override
+		public void updateAuditStatus(Long[] ids, String status) {
+			for(Long id:ids) {
+				TbGoods goods = goodsMapper.selectByPrimaryKey(id);
+				goods.setAuditStatus(status);
+				goodsMapper.updateByPrimaryKey(goods);
+			}
+			
+			
+		}
+
 		
 	
 }

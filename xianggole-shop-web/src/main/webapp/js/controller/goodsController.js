@@ -76,8 +76,7 @@ app.controller('goodsController' ,function($scope,$controller,$location,goodsSer
 				if(response.success){
 					//重新查询 
 					alert(response.message);
-						$scope.entity={};
-						editor.html('');
+						location.href='goods.html';
 				}else{
 					alert(response.message);
 				}
@@ -139,6 +138,7 @@ app.controller('goodsController' ,function($scope,$controller,$location,goodsSer
 		$scope.$watch('entity.goods.category1Id',function(newValue,oldValue){
 			itemCatService.findParentById(newValue).success(function(response){
 				$scope.itemCat2List=response;
+				if($location.search()['id']==null)
 				$scope.entity.goods.category3Id={};
 			});
 		});
