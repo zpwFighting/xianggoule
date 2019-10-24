@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -36,6 +38,7 @@ import entity.PageResult;
  *
  */
 @Service
+@Transactional
 public class GoodsServiceImpl implements GoodsService {
 
 	@Autowired
@@ -77,7 +80,6 @@ public class GoodsServiceImpl implements GoodsService {
 	public void add(Goods goods) {
 		goods.getGoods().setAuditStatus("0");
 		goodsMapper.insert(goods.getGoods());	
-		
 		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
 		goodsDescMapper.insert(goods.getGoodsDesc());
 		saveItemList(goods);
@@ -193,7 +195,9 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void delete(Long[] ids) {
 		for(Long id:ids){
-			goodsMapper.deleteByPrimaryKey(id);
+			TbGoods goods = goodsMapper.selectByPrimaryKey(id);
+			goods.setIsDelete("1");
+			goodsMapper.updateByPrimaryKey(goods);
 		}		
 	}
 	
@@ -204,7 +208,7 @@ public class GoodsServiceImpl implements GoodsService {
 		
 		TbGoodsExample example=new TbGoodsExample();
 		Criteria criteria = example.createCriteria();
-		
+		criteria.andIsDeleteIsNull();
 		if(goods!=null){			
 			if(goods.getSellerId()!=null && goods.getSellerId().length()>0){
 				//criteria.andSellerIdLike("%"+goods.getSellerId()+"%");

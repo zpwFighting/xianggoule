@@ -1,5 +1,5 @@
  //控制层 
-app.controller('goodsController' ,function($scope,$controller,$location,goodsService,itemCatService){	
+app.controller('goodsController' ,function($scope,$controller,$location,$location,brandService,goodsService,itemCatService,typeTemplateService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -23,7 +23,11 @@ app.controller('goodsController' ,function($scope,$controller,$location,goodsSer
 	}
 	
 	//查询实体 
-	$scope.findOne=function(id){				
+	$scope.findOne=function(id){		
+			var id = $location.search()['id'];
+			if(id==null){
+				return ;
+			}
 		goodsService.findOne(id).success(
 				function(response){
 					$scope.entity= response;		
@@ -93,7 +97,15 @@ app.controller('goodsController' ,function($scope,$controller,$location,goodsSer
 			}
 		});
 	}
-	
+	//商品品牌查询
+	$scope.brandList=[];
+	$scope.findBrandList=function(){
+		  brandService.findAll().success(function(response){
+			for(var i=0;i<response.length;i++){
+				$scope.brandList[response[i].id]=response[i].name;
+			}
+		});
+	}
 	$scope.updateStatus=function(status){
 		goodsService.updateStatus($scope.selectIds,status).success(function(response){
 			if(response.success){
@@ -105,4 +117,25 @@ app.controller('goodsController' ,function($scope,$controller,$location,goodsSer
 		});
 	}
     
+		
 });	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
