@@ -280,5 +280,9 @@
 		<module>xianggole-sellergoods-service</module>
 		<module>xianggole-manager-web</module>
 		<module>xianggole-shop-web</module>
+
+		<module>xianggole-content-interface</module>
+		<module>xianggole-content-service</module>
+		<module>xainggole-portal-web</module>
 	</modules>
 </project>

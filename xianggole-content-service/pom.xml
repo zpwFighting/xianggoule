@@ -5,11 +5,8 @@
     <artifactId>xianggole-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xianggoule</groupId>
   <artifactId>xianggole-content-service</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
-  
   <dependencies>
   <dependency>
 		<groupId>org.springframework</groupId>
@@ -87,6 +84,11 @@
 	<dependency>
 		<groupId>com.xianggoule</groupId>
 		<artifactId>xianggole-content-interface</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>com.xianggoule</groupId>
+		<artifactId>xianggole-common</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
   </dependencies>

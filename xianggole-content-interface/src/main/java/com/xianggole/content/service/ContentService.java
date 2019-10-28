@@ -1,6 +1,7 @@
 package com.xianggole.content.service;
 import java.util.List;
 import com.xianggole.pojo.TbContent;
+import com.xianggole.pojo.TbContentCategory;
 
 import entity.PageResult;
 /**
@@ -59,4 +60,9 @@ public interface ContentService {
 	 */
 	public PageResult findPage(TbContent content, int pageNum,int pageSize);
 	
+	/**
+	 * 根据广告内容类目ID
+	 * @return
+	 */
+	public List<TbContent> findByCategoryId(Long CategoryId);
 }

@@ -59,4 +59,5 @@ public interface ContentCategoryService {
 	 */
 	public PageResult findPage(TbContentCategory contentCategory, int pageNum,int pageSize);
 	
+	
 }

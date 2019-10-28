@@ -1,6 +1,8 @@
 package com.xianggole.content.service.impl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -48,6 +50,7 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public void add(TbContent content) {
 		contentMapper.insert(content);		
+		redisTemplate.boundHashOps("content").delete(content.getCategoryId());
 	}
 
 	
@@ -56,7 +59,13 @@ public class ContentServiceImpl implements ContentService {
 	 */
 	@Override
 	public void update(TbContent content){
+		Long categoryId = contentMapper.selectByPrimaryKey(content.getId()).getCategoryId();
+		redisTemplate.boundHashOps("content").delete(categoryId);
+		
 		contentMapper.updateByPrimaryKey(content);
+		if(categoryId.longValue()!=content.getCategoryId().longValue()) {
+			redisTemplate.boundHashOps("content").delete(content.getCategoryId());
+		}
 	}	
 	
 	/**
@@ -75,6 +84,8 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public void delete(Long[] ids) {
 		for(Long id:ids){
+		     Long categoryId = contentMapper.selectByPrimaryKey(id).getCategoryId();
+			redisTemplate.boundHashOps("content").delete(categoryId);
 			contentMapper.deleteByPrimaryKey(id);
 		}		
 	}
@@ -106,5 +117,26 @@ public class ContentServiceImpl implements ContentService {
 		Page<TbContent> page= (Page<TbContent>)contentMapper.selectByExample(example);		
 		return new PageResult(page.getTotal(), page.getResult());
 	}
+
+		@Autowired
+		private RedisTemplate redisTemplate;
+		@Override
+		public List<TbContent> findByCategoryId(Long CategoryId) {
+			List<TbContent> list = (List<TbContent>) redisTemplate.boundHashOps("content").get(CategoryId);
+			
+			if(list==null) {
+				System.out.println("从数据库查出数据放入缓存");
+				TbContentExample example = new TbContentExample();
+				Criteria criteria = example.createCriteria();
+				criteria.andCategoryIdEqualTo(CategoryId);
+				criteria.andStatusEqualTo("1");
+				example.setOrderByClause("sort_order");
+				list = contentMapper.selectByExample(example);
+				redisTemplate.boundHashOps("content").put(CategoryId, list);
+				
+			}
+			System.out.println("从缓存查出数据");
+			return list;
+		}
 	
 }
