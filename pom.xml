@@ -284,5 +284,9 @@
 		<module>xianggole-content-interface</module>
 		<module>xianggole-content-service</module>
 		<module>xainggole-portal-web</module>
+		<module>xianggole-solr-util</module>
+		<module>xinaggole-search-interface</module>
+		<module>xianggole-search-service</module>
+		<module>xianggole-search-web</module>
 	</modules>
 </project>
