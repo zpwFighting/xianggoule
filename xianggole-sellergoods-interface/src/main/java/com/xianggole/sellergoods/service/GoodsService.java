@@ -1,6 +1,7 @@
 package com.xianggole.sellergoods.service;
 import java.util.List;
 import com.xianggole.pojo.TbGoods;
+import com.xianggole.pojo.TbItem;
 import com.xianggole.pojogroup.Goods;
 
 import entity.PageResult;
@@ -64,4 +65,6 @@ public interface GoodsService {
 	 * 更改审核状态
 	 */
 	public void updateAuditStatus(Long[] ids,String status);
+	
+	public List<TbItem> searchItemListByGoodsListAndStatus(Long []goodsIds,String status);
 }

@@ -1,4 +1,5 @@
 package com.xianggole.manager.controller;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -6,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.xianggole.pojo.TbGoods;
+import com.xianggole.pojo.TbItem;
 import com.xianggole.pojogroup.Goods;
+import com.xianggole.search.service.ItemSearchService;
 import com.xianggole.sellergoods.service.GoodsService;
 
 import entity.PageResult;
@@ -23,7 +26,8 @@ public class GoodsController {
 
 	@Reference
 	private GoodsService goodsService;
-	
+	@Reference(timeout=100000)
+	private ItemSearchService itemSearchService;
 	/**
 	 * 返回全部列表
 	 * @return
@@ -94,6 +98,8 @@ public class GoodsController {
 	public Result delete(Long [] ids){
 		try {
 			goodsService.delete(ids);
+			
+			itemSearchService.deleteByGoodsIds(Arrays.asList(ids));
 			return new Result(true, "删除成功"); 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -115,10 +121,21 @@ public class GoodsController {
 	/**
 	 * 更改审核状态
 	 */
+	
+	
 	@RequestMapping("/updateStatus")
 	public Result updateAuditStatus(Long[] ids,String status){
 		try {
 			goodsService.updateAuditStatus(ids, status);
+			
+			if("1".equals(status)) {
+				
+				List<TbItem> list = goodsService.searchItemListByGoodsListAndStatus(ids,status);
+				
+				//导入
+				itemSearchService.importList(list);
+				
+			}
 			return new Result(true, "更改成功"); 
 		} catch (Exception e) {
 			e.printStackTrace();

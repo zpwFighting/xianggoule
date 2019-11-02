@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Criteria;
@@ -18,6 +19,7 @@ import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFilterQuery;
 import org.springframework.data.solr.core.query.SimpleHighlightQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.SolrDataQuery;
 import org.springframework.data.solr.core.query.result.GroupEntry;
 import org.springframework.data.solr.core.query.result.GroupPage;
 import org.springframework.data.solr.core.query.result.GroupResult;
@@ -38,6 +40,9 @@ public class ItemSearchServiceImpl implements ItemSearchService{
 	@Override
 	public Map search(Map searchMap) {
 		Map map = new HashMap();
+		//空格处理
+		String keywords = (String)searchMap.get("keywords");
+		searchMap.put("keywords",keywords.replace(" ", "") );
 		//1.查询列表
 		map.putAll(searchList(searchMap));
 		//2.分组查询商品分类列表
@@ -135,6 +140,25 @@ public class ItemSearchServiceImpl implements ItemSearchService{
         query.setOffset((pageNo-1)*pageSize);//起始索引
         query.setRows(pageSize);
 
+        
+		//1.7排序
+       
+        String sortValue = (String)searchMap.get("sort");//升序还是降序
+        String sortField = (String)searchMap.get("sortField");//排序字段
+        
+        if(!"".equals(sortValue) && sortValue!=null) {
+        	if(sortValue.equals("ASC")) {
+        		
+        		Sort sort = new Sort(Sort.Direction.ASC,"item_"+sortField);
+        		query.addSort(sort);
+        	}else {
+        		Sort sort = new Sort(Sort.Direction.DESC,"item_"+sortField);
+        		query.addSort(sort);
+        	}
+        }
+        
+        
+       
 		
 		//*******获取高亮结果集**********
 		//高亮页对象
@@ -210,6 +234,24 @@ public class ItemSearchServiceImpl implements ItemSearchService{
 		}
 		
 		return map;
+	}
+
+	@Override
+	public void importList(List list) {
+		
+		solrTemplate.saveBeans(list);
+		solrTemplate.commit();
+		
+	}
+
+	@Override
+	public void deleteByGoodsIds(List goodsIds) {
+
+		Query query = new SimpleQuery("");
+		Criteria criteria = new Criteria("item_goodsid").in(goodsIds);
+		query.addCriteria(criteria );
+		solrTemplate.delete(query );
+		solrTemplate.commit();
 	}
 
 	
