@@ -80,6 +80,11 @@
 		<artifactId>servlet-api</artifactId>		
 		<scope>provided</scope>
 	</dependency>
+	<dependency>
+		<groupId>com.xianggoule</groupId>
+		<artifactId>xianggole-common</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
   </dependencies>
   
   <build>  
